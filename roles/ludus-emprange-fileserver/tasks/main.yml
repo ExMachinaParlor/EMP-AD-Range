@@ -1,0 +1,177 @@
+---
+# ---------- Server features ----------
+- name: Install File Server, FSRM and AD PowerShell
+  ansible.windows.win_feature:
+    name:
+      - FS-FileServer
+      - FS-Resource-Manager
+      - RSAT-AD-PowerShell
+    state: present
+    include_management_tools: true
+  register: fs_features
+
+- name: Reboot if features require it
+  ansible.windows.win_reboot:
+  when: fs_features.reboot_required
+
+# ---------- AD objects (explicit creds avoid WinRM double-hop) ----------
+- name: Create base OU
+  microsoft.ad.ou:
+    name: "{{ fs_ou_name }}"
+    path: "{{ fs_domain_dn }}"
+    state: present
+    domain_server: "{{ fs_domain_server }}"
+    domain_username: "{{ fs_netbios }}\\{{ fs_domain_admin }}"
+    domain_password: "{{ fs_domain_admin_password }}"
+
+- name: Create Groups and Users sub-OUs
+  microsoft.ad.ou:
+    name: "{{ item }}"
+    path: "OU={{ fs_ou_name }},{{ fs_domain_dn }}"
+    state: present
+    domain_server: "{{ fs_domain_server }}"
+    domain_username: "{{ fs_netbios }}\\{{ fs_domain_admin }}"
+    domain_password: "{{ fs_domain_admin_password }}"
+  loop: [Groups, Users]
+
+- name: Create department security groups
+  microsoft.ad.group:
+    name: "GRP-{{ item.name }}"
+    scope: global
+    category: security
+    path: "OU=Groups,OU={{ fs_ou_name }},{{ fs_domain_dn }}"
+    state: present
+    domain_server: "{{ fs_domain_server }}"
+    domain_username: "{{ fs_netbios }}\\{{ fs_domain_admin }}"
+    domain_password: "{{ fs_domain_admin_password }}"
+  loop: "{{ fs_departments }}"
+  loop_control:
+    label: "GRP-{{ item.name }}"
+
+- name: Create department users and add to their group
+  microsoft.ad.user:
+    name: "{{ item.1 }}"
+    sam_account_name: "{{ item.1 }}"
+    upn: "{{ item.1 }}@{{ fs_domain }}"
+    password: "{{ fs_user_password }}"
+    password_never_expires: true
+    update_password: on_create
+    enabled: true
+    path: "OU=Users,OU={{ fs_ou_name }},{{ fs_domain_dn }}"
+    groups:
+      add:
+        - "GRP-{{ item.0.name }}"
+    state: present
+    domain_server: "{{ fs_domain_server }}"
+    domain_username: "{{ fs_netbios }}\\{{ fs_domain_admin }}"
+    domain_password: "{{ fs_domain_admin_password }}"
+  loop: "{{ fs_departments | subelements('users') }}"
+  loop_control:
+    label: "{{ item.1 }} -> GRP-{{ item.0.name }}"
+
+# ---------- Folders + NTFS ----------
+- name: Create share root and Public folder
+  ansible.windows.win_file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ fs_share_root }}"
+    - "{{ fs_share_root }}\\{{ fs_public_share }}"
+
+- name: Create department folders
+  ansible.windows.win_file:
+    path: "{{ fs_share_root }}\\{{ item.name }}"
+    state: directory
+  loop: "{{ fs_departments }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Break inheritance on department folders (drops BUILTIN\Users)
+  ansible.windows.win_acl_inheritance:
+    path: "{{ fs_share_root }}\\{{ item.name }}"
+    state: absent
+    reorganize: false
+  loop: "{{ fs_departments }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Grant SYSTEM / Administrators / Domain Admins Full Control on department folders
+  ansible.windows.win_acl:
+    path: "{{ fs_share_root }}\\{{ item.0.name }}"
+    user: "{{ item.1 }}"
+    rights: FullControl
+    type: allow
+    state: present
+    inherit: ContainerInherit, ObjectInherit
+    propagation: None
+  loop: "{{ fs_departments | product(['SYSTEM', 'BUILTIN\\Administrators', fs_netbios ~ '\\Domain Admins']) | list }}"
+  loop_control:
+    label: "{{ item.0.name }}: {{ item.1 }}"
+
+- name: Grant department group Modify on its folder
+  ansible.windows.win_acl:
+    path: "{{ fs_share_root }}\\{{ item.name }}"
+    user: "{{ fs_netbios }}\\GRP-{{ item.name }}"
+    rights: Modify
+    type: allow
+    state: present
+    inherit: ContainerInherit, ObjectInherit
+    propagation: None
+  loop: "{{ fs_departments }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Grant Domain Users Modify on Public
+  ansible.windows.win_acl:
+    path: "{{ fs_share_root }}\\{{ fs_public_share }}"
+    user: "{{ fs_netbios }}\\Domain Users"
+    rights: Modify
+    type: allow
+    state: present
+    inherit: ContainerInherit, ObjectInherit
+    propagation: None
+
+# ---------- SMB shares ----------
+- name: Publish department shares
+  ansible.windows.win_share:
+    name: "{{ item.name }}"
+    path: "{{ fs_share_root }}\\{{ item.name }}"
+    description: "{{ item.name }} department share"
+    full: "{{ fs_netbios }}\\Domain Admins"
+    change: "{{ fs_netbios }}\\GRP-{{ item.name }}"
+    list: false
+    state: present
+  loop: "{{ fs_departments }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Publish Public share
+  ansible.windows.win_share:
+    name: "{{ fs_public_share }}"
+    path: "{{ fs_share_root }}\\{{ fs_public_share }}"
+    description: Company-wide public share
+    full: "{{ fs_netbios }}\\Domain Admins"
+    change: "{{ fs_netbios }}\\Domain Users"
+    list: true
+    state: present
+
+# ---------- Seed content ----------
+- name: Seed a README in each department share
+  ansible.windows.win_copy:
+    dest: "{{ fs_share_root }}\\{{ item.name }}\\README.txt"
+    content: |
+      {{ item.name }} department share - {{ fs_domain }}
+      Access: {{ fs_netbios }}\GRP-{{ item.name }} (Modify)
+      Members: {{ item.users | join(', ') }}
+    force: false
+  loop: "{{ fs_departments }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Seed Public share welcome file
+  ansible.windows.win_copy:
+    dest: "{{ fs_share_root }}\\{{ fs_public_share }}\\Welcome.txt"
+    content: |
+      Welcome to the {{ fs_domain }} file server (FS01).
+      Department shares: {{ fs_departments | map(attribute='name') | join(', ') }}
+    force: false

@@ -1,0 +1,26 @@
+# Override these from role_vars in range-config.yml
+fs_domain: emprange.net
+fs_netbios: EMPRANGE
+fs_domain_server: "DC01.{{ fs_domain }}"
+fs_domain_admin: domainadmin
+fs_domain_admin_password: password
+
+# Derived: DC=emprange,DC=net
+fs_domain_dn: "DC={{ fs_domain.split('.') | join(',DC=') }}"
+fs_ou_name: EMP
+fs_share_root: 'C:\Shares'
+
+fs_user_password: password
+
+fs_departments:
+  - name: Finance
+    users: [jsmith, mgarcia]
+  - name: HR
+    users: [alee, bpatel]
+  - name: IT
+    users: [dnguyen, kowens]
+  - name: Engineering
+    users: [rchen, tbrooks]
+
+# Readable/writable by all Domain Users
+fs_public_share: Public

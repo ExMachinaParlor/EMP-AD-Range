@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" width="1200" height="860" font-family="'JetBrains Mono','DejaVu Sans Mono',Consolas,monospace">
+<defs>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b949e"/></marker>
+</defs>
+<rect width="1200" height="860" fill="#0d1117"/>
+<text x="40" y="46" fill="#e6edf3" font-size="24" font-weight="700">EMP AD Range — emprange.net</text>
+<text x="40" y="70" fill="#8b949e" font-size="13">Ludus 2.x on ludusv4 · 3 VLANs · inter-VLAN ACCEPT · external ACCEPT</text>
+<rect x="40" y="100" width="240" height="70" rx="8" fill="#161b22" stroke="#8b949e" stroke-width="2"/>
+<text x="160" y="130" fill="#e6edf3" font-size="15" font-weight="700" text-anchor="middle">Internet</text>
+<text x="160" y="152" fill="#8b949e" font-size="12" font-weight="400" text-anchor="middle">NAT via range router</text>
+<rect x="440" y="95" width="320" height="80" rx="8" fill="#161b22" stroke="#e6edf3" stroke-width="2"/>
+<text x="600" y="124" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="middle">ludusv4</text>
+<text x="600" y="145" fill="#8b949e" font-size="12" font-weight="400" text-anchor="middle">Proxmox VE · Ludus 2.x</text>
+<text x="600" y="163" fill="#8b949e" font-size="12" font-weight="400" text-anchor="middle">i7-1195G7 4C/8T · 62.5 GiB · 931 GB</text>
+<rect x="920" y="100" width="240" height="70" rx="8" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+<text x="1040" y="130" fill="#e6edf3" font-size="15" font-weight="700" text-anchor="middle">WireGuard client</text>
+<text x="1040" y="152" fill="#d29922" font-size="12" font-weight="400" text-anchor="middle">198.51.100.0/24</text>
+<line x1="920" y1="135" x2="762" y2="135" stroke="#d29922" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arr)"/>
+<text x="841" y="126" fill="#d29922" font-size="11" font-weight="400" text-anchor="middle">ludus user wireguard</text>
+<rect x="430" y="225" width="340" height="80" rx="8" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+<text x="600" y="255" fill="#e6edf3" font-size="15" font-weight="700" text-anchor="middle">Range Router (Ludus)</text>
+<text x="600" y="276" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="middle">10.X.10.254 · 10.X.20.254 · 10.X.30.254</text>
+<text x="600" y="294" fill="#8b949e" font-size="11" font-weight="400" text-anchor="middle">inter_vlan_default: ACCEPT</text>
+<line x1="600" y1="175" x2="600" y2="223" stroke="#8b949e" stroke-width="2" marker-end="url(#arr)"/>
+<path d="M282,135 L360,135 L360,265 L428,265" fill="none" stroke="#8b949e" stroke-width="2" marker-start="url(#arr)"/>
+<text x="366" y="210" fill="#8b949e" font-size="11" font-weight="400" text-anchor="start">WAN</text>
+<rect x="40" y="360" width="360" height="400" rx="10" fill="#0d1117" stroke="#58a6ff" stroke-width="2" stroke-dasharray="8 5"/>
+<text x="56" y="386" fill="#58a6ff" font-size="15" font-weight="700" text-anchor="start">VLAN 10 — Servers</text>
+<text x="384" y="386" fill="#8b949e" font-size="12" font-weight="400" text-anchor="end">10.X.10.0/24</text>
+<path d="M600,305 L600,330 L220,330 L220,358" fill="none" stroke="#58a6ff" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="56" y="405" width="328" height="100" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+<text x="72" y="431" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="start">DC01</text>
+<text x="368" y="431" fill="#58a6ff" font-size="13" font-weight="400" text-anchor="end">10.X.10.11</text>
+<text x="72" y="453" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="start">primary-dc</text>
+<text x="72" y="473" fill="#8b949e" font-size="11.5" font-weight="400" text-anchor="start">Win Server 2022 · 6 GB · 2 vCPU</text>
+<text x="72" y="493" fill="#e6edf3" font-size="11.5" font-weight="400" text-anchor="start">AD DS · DNS · GC · repl ⇅</text>
+<rect x="56" y="520" width="328" height="100" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+<text x="72" y="546" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="start">DC02</text>
+<text x="368" y="546" fill="#58a6ff" font-size="13" font-weight="400" text-anchor="end">10.X.10.12</text>
+<text x="72" y="568" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="start">alt-dc</text>
+<text x="72" y="588" fill="#8b949e" font-size="11.5" font-weight="400" text-anchor="start">Win Server 2022 · 6 GB · 2 vCPU</text>
+<text x="72" y="608" fill="#e6edf3" font-size="11.5" font-weight="400" text-anchor="start">AD DS · DNS · GC · repl ⇅</text>
+<rect x="56" y="635" width="328" height="100" rx="8" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+<text x="72" y="661" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="start">FS01</text>
+<text x="368" y="661" fill="#58a6ff" font-size="13" font-weight="400" text-anchor="end">10.X.10.21</text>
+<text x="72" y="683" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="start">member</text>
+<text x="72" y="703" fill="#8b949e" font-size="11.5" font-weight="400" text-anchor="start">Win Server 2022 · 6 GB · 2 vCPU</text>
+<text x="72" y="723" fill="#e6edf3" font-size="11.5" font-weight="400" text-anchor="start">SMB: Finance HR IT Engineering Public</text>
+<rect x="420" y="360" width="360" height="400" rx="10" fill="#0d1117" stroke="#3fb950" stroke-width="2" stroke-dasharray="8 5"/>
+<text x="436" y="386" fill="#3fb950" font-size="15" font-weight="700" text-anchor="start">VLAN 20 — Workstations</text>
+<text x="764" y="386" fill="#8b949e" font-size="12" font-weight="400" text-anchor="end">10.X.20.0/24</text>
+<path d="M600,305 L600,330 L600,330 L600,358" fill="none" stroke="#3fb950" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="436" y="405" width="328" height="100" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+<text x="452" y="431" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="start">WS01</text>
+<text x="748" y="431" fill="#3fb950" font-size="13" font-weight="400" text-anchor="end">10.X.20.101</text>
+<text x="452" y="453" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="start">member</text>
+<text x="452" y="473" fill="#8b949e" font-size="11.5" font-weight="400" text-anchor="start">Windows 11 25H2 Ent · 8 GB · 2 vCPU</text>
+<text x="452" y="493" fill="#e6edf3" font-size="11.5" font-weight="400" text-anchor="start">domain users · Ludus extra tools</text>
+<rect x="436" y="520" width="328" height="100" rx="8" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+<text x="452" y="546" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="start">WS02</text>
+<text x="748" y="546" fill="#3fb950" font-size="13" font-weight="400" text-anchor="end">10.X.20.102</text>
+<text x="452" y="568" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="start">member</text>
+<text x="452" y="588" fill="#8b949e" font-size="11.5" font-weight="400" text-anchor="start">Windows 11 25H2 Ent · 8 GB · 2 vCPU</text>
+<text x="452" y="608" fill="#e6edf3" font-size="11.5" font-weight="400" text-anchor="start">domain users · Ludus extra tools</text>
+<rect x="800" y="360" width="360" height="400" rx="10" fill="#0d1117" stroke="#f0883e" stroke-width="2" stroke-dasharray="8 5"/>
+<text x="816" y="386" fill="#f0883e" font-size="15" font-weight="700" text-anchor="start">VLAN 30 — DMZ / Web</text>
+<text x="1144" y="386" fill="#8b949e" font-size="12" font-weight="400" text-anchor="end">10.X.30.0/24</text>
+<path d="M600,305 L600,330 L980,330 L980,358" fill="none" stroke="#f0883e" stroke-width="2" marker-end="url(#arr)"/>
+<rect x="816" y="405" width="328" height="100" rx="8" fill="#161b22" stroke="#f0883e" stroke-width="2"/>
+<text x="832" y="431" fill="#e6edf3" font-size="16" font-weight="700" text-anchor="start">WEB01</text>
+<text x="1128" y="431" fill="#f0883e" font-size="13" font-weight="400" text-anchor="end">10.X.30.10</text>
+<text x="832" y="453" fill="#bc8cff" font-size="12" font-weight="400" text-anchor="start">linux</text>
+<text x="832" y="473" fill="#8b949e" font-size="11.5" font-weight="400" text-anchor="start">Debian 12 · 2 GB · 2 vCPU</text>
+<text x="832" y="493" fill="#e6edf3" font-size="11.5" font-weight="400" text-anchor="start">Apache2 :80 · intranet page</text>
+<path d="M386,450 L393,450 L393,565 L386,565" fill="none" stroke="#58a6ff" stroke-width="2" stroke-dasharray="4 3" marker-start="url(#arr)" marker-end="url(#arr)"/>
+<rect x="40" y="780" width="1120" height="60" rx="8" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+<text x="60" y="804" fill="#e6edf3" font-size="12" font-weight="400" text-anchor="start">Domain: emprange.net (EMPRANGE)  ·  OU=EMP → Groups: GRP-Finance, GRP-HR, GRP-IT, GRP-Engineering  ·  2 users each</text>
+<text x="60" y="826" fill="#8b949e" font-size="12" font-weight="400" text-anchor="start">Flows: WS → DC01/DC02 (DNS 53, Kerberos 88, LDAP 389, SMB 445)  ·  WS → FS01 SMB 445  ·  WS/WG → WEB01 HTTP 80</text>
+</svg>

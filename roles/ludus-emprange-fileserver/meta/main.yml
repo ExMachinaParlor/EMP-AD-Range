@@ -1,0 +1,10 @@
+galaxy_info:
+  role_name: ludus_emprange_fileserver
+  author: l3xic0n
+  description: Builds FS01 as a departmental SMB file server for the EMP AD range
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Windows
+      versions: ["2022"]
+dependencies: []

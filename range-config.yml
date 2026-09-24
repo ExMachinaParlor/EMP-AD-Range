@@ -1,0 +1,121 @@
+# EMP AD range: 2 DCs, file server, 2x Win11 workstations, Debian Apache web server
+# Target host: ludusv4 (i7-1195G7 4C/8T, 62.5 GiB RAM, ~930 GB storage)
+# Domain: emprange.net (NetBIOS: EMPRANGE)
+#
+# VLAN layout (inter-VLAN traffic: ACCEPT)
+#   10 - Servers       DC01 .11, DC02 .12, FS01 .21
+#   20 - Workstations  WS01 .101, WS02 .102
+#   30 - DMZ / Web     WEB01 .10
+#
+# Install roles first: ./scripts/install-roles.sh
+
+ludus:
+  # ---------------- VLAN 10: Servers ----------------
+  - vm_name: "{{ range_id }}-DC01"
+    hostname: "DC01"
+    template: win2022-server-x64-template
+    vlan: 10
+    ip_last_octet: 11
+    ram_gb: 6
+    cpus: 2
+    windows:
+      sysprep: false
+    domain:
+      fqdn: emprange.net
+      role: primary-dc
+
+  - vm_name: "{{ range_id }}-DC02"
+    hostname: "DC02"
+    template: win2022-server-x64-template
+    vlan: 10
+    ip_last_octet: 12
+    ram_gb: 6
+    cpus: 2
+    windows:
+      sysprep: false
+    domain:
+      fqdn: emprange.net
+      role: alt-dc
+
+  - vm_name: "{{ range_id }}-FS01"
+    hostname: "FS01"
+    template: win2022-server-x64-template
+    vlan: 10
+    ip_last_octet: 21
+    ram_gb: 6
+    cpus: 2
+    windows:
+      sysprep: false
+    domain:
+      fqdn: emprange.net
+      role: member
+    roles:
+      - ludus-emprange-fileserver
+    role_vars:
+      fs_domain: emprange.net
+      fs_netbios: EMPRANGE
+      fs_domain_server: DC01.emprange.net
+      fs_domain_admin: domainadmin
+      fs_domain_admin_password: password
+
+  # ---------------- VLAN 20: Workstations ----------------
+  - vm_name: "{{ range_id }}-WS01"
+    hostname: "WS01"
+    template: win11-25h2-x64-enterprise-template
+    vlan: 20
+    ip_last_octet: 101
+    ram_gb: 8
+    cpus: 2
+    windows:
+      install_additional_tools: true
+    domain:
+      fqdn: emprange.net
+      role: member
+
+  - vm_name: "{{ range_id }}-WS02"
+    hostname: "WS02"
+    template: win11-25h2-x64-enterprise-template
+    vlan: 20
+    ip_last_octet: 102
+    ram_gb: 8
+    cpus: 2
+    windows:
+      install_additional_tools: true
+    domain:
+      fqdn: emprange.net
+      role: member
+
+  # ---------------- VLAN 30: DMZ / Web ----------------
+  - vm_name: "{{ range_id }}-WEB01"
+    hostname: "WEB01"
+    template: debian-12-x64-server-template
+    vlan: 30
+    ip_last_octet: 10
+    ram_gb: 2
+    cpus: 2
+    linux: true
+    roles:
+      - geerlingguy.apache
+      - ludus-emprange-web
+    role_vars:
+      apache_listen_port: 80
+      apache_remove_default_vhost: false
+      web_site_title: "EMP Range Intranet"
+      web_domain: emprange.net
+
+network:
+  inter_vlan_default: ACCEPT
+  external_default: ACCEPT
+
+defaults:
+  snapshot_with_RAM: true
+  stale_hours: 0
+  ad_domain_functional_level: Win2012R2
+  ad_forest_functional_level: Win2012R2
+  ad_domain_admin: domainadmin
+  ad_domain_admin_password: password
+  ad_domain_user: domainuser
+  ad_domain_user_password: password
+  ad_domain_safe_mode_password: password
+  timezone: America/New_York
+  enable_dynamic_wallpaper: false

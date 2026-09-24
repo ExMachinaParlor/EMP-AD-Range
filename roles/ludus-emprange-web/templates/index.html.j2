@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ web_site_title }}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 3rem; background: #111; color: #eee; }
+    code { color: #7fd; }
+  </style>
+</head>
+<body>
+  <h1>{{ web_site_title }}</h1>
+  <p>Host: <code>{{ ansible_hostname }}</code> &middot; Domain: <code>{{ web_domain }}</code></p>
+  <p>File shares: <code>\\FS01.{{ web_domain }}\Public</code></p>
+</body>
+</html>

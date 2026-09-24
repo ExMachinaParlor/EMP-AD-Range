@@ -1,0 +1,4 @@
+web_site_title: "EMP Range Intranet"
+web_domain: emprange.net
+web_docroot: /var/www/html
+web_service: apache2

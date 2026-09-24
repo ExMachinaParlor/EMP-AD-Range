@@ -1,0 +1,8 @@
+# Galaxy dependencies for the EMP AD range
+roles:
+  - name: geerlingguy.apache
+
+collections:
+  - name: ansible.windows
+  - name: community.windows
+  - name: microsoft.ad
