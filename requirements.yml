@@ -2,6 +2,8 @@
 roles:
   - name: geerlingguy.apache
 
+# Collections below ship globally with Ludus (Ansible community package).
+# Listed for reference only; `ludus ansible collection add` is not needed.
 collections:
   - name: ansible.windows
   - name: community.windows

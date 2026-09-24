@@ -1,20 +1,17 @@
 #!/usr/bin/env bash
-# Install all roles/collections this range needs into Ludus, then load the config.
-# Verify each flag with `ludus <cmd> --help` on your Ludus version before running.
-set -euo pipefail
+# Install all roles this range needs into Ludus, then load the range config.
+# Role-install commands verified on ludusv4 (Ludus 2.x).
+# Collections (ansible.windows, community.windows, microsoft.ad) ship globally with Ludus.
+set -uo pipefail
 cd "$(dirname "$0")/.."
 
 # Galaxy role
-ludus ansible role add geerlingguy.apache
-
-# Collections used by ludus-emprange-fileserver (normally already on the Ludus host)
-for c in ansible.windows community.windows microsoft.ad; do
-  ludus ansible collection add "$c" || echo "[!] collection $c: add failed or already installed"
-done
+ludus ansible role add geerlingguy.apache --force || echo "[!] geerlingguy.apache add failed"
 
 # Local roles (from directory)
-ludus ansible role add -d ./roles/ludus-emprange-fileserver
-ludus ansible role add -d ./roles/ludus-emprange-web
+for r in ./roles/*/; do
+  ludus ansible role add -d "$r" --force || echo "[!] failed: $r"
+done
 
 ludus ansible role list
 

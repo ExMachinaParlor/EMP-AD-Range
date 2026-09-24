@@ -2,7 +2,7 @@
 
 Two DCs, a departmental file server, two Windows 11 workstations, and a Debian Apache web server, sized for **ludusv4** (i7-1195G7, 62.5 GiB RAM).
 
-> Ludus 2.x flags have shifted from 1.x. Confirm any command with `ludus <command> --help` on ludusv4 before running it.
+> Commands marked ✅ have been run successfully on ludusv4. Anything else: confirm with `ludus <command> --help` first, since Ludus 2.x flags have shifted from 1.x.
 
 ## Network diagram
 
@@ -28,8 +28,8 @@ VLAN 10 Servers · VLAN 20 Workstations · VLAN 30 DMZ/Web. Inter-VLAN and exter
 
 ```
 range-config.yml                    Ludus range config
-requirements.yml                    Galaxy role + collections
-scripts/install-roles.sh            Installs roles/collections, sets config (automated path)
+requirements.yml                    Galaxy role (collections listed for reference; built into Ludus)
+scripts/install-roles.sh            Installs all roles, loads the range config
 docs/network-diagram.svg            Network diagram (SVG) + PNG export
 roles/ludus-emprange-fileserver/    FS01: OUs, dept groups/users, NTFS, SMB shares, seed files
 roles/ludus-emprange-web/           WEB01: intranet index page + health check (runs after geerlingguy.apache)
@@ -37,27 +37,37 @@ roles/ludus-emprange-web/           WEB01: intranet index page + health check (r
 
 ---
 
-## 1. Add the roles manually
+## 1. Add the roles
+
+### All-in-one ✅
+
+From the repo root (`/home/empadmin/Downloads/EMP-AD-Range` on ludusv4):
+
+```bash
+ludus ansible role add geerlingguy.apache --force; \
+for r in ./roles/*/; do ludus ansible role add -d "$r" --force || echo "[!] failed: $r"; done; \
+ludus ansible role list
+```
+
+This adds the Galaxy role, then every local role under `roles/`. New roles you drop into `roles/` get picked up automatically. Steps are joined with `;`, not `&&`, so an "already installed" error on one item does not stop the rest. `--force` reinstalls anything already present.
+
+### Manually, one at a time ✅
 
 Run from the repo root on the Ludus host (or any machine with the Ludus client and your API key).
 
 ```bash
-# Galaxy role for Apache on WEB01
-ludus ansible role add geerlingguy.apache
+# Galaxy role for Apache on WEB01 (--force makes it safe to re-run)
+ludus ansible role add geerlingguy.apache --force
 
-# Collections used by the FS01 role (usually already present on a Ludus host)
-ludus ansible collection add ansible.windows
-ludus ansible collection add community.windows
-ludus ansible collection add microsoft.ad
-
-# Local custom roles (from directory)
-ludus ansible role add -d ./roles/ludus-emprange-fileserver
-ludus ansible role add -d ./roles/ludus-emprange-web
+# Local custom roles (from directory; --force overwrites an existing copy)
+ludus ansible role add -d ./roles/ludus-emprange-fileserver --force
+ludus ansible role add -d ./roles/ludus-emprange-web --force
 
 # Confirm everything is installed
 ludus ansible role list
-ludus ansible collection list
 ```
+
+**Collections:** the FS01 role uses `ansible.windows`, `community.windows` and `microsoft.ad`. These ship with the Ansible community package, and Ludus installs them globally, so you don't add them yourself. `ludus ansible collection add` returns "Collection already installed" for them.
 
 After editing a local role, re-add it so Ludus picks up the change:
 
@@ -65,7 +75,19 @@ After editing a local role, re-add it so Ludus picks up the change:
 ludus ansible role add -d ./roles/ludus-emprange-fileserver --force
 ```
 
-Or run everything above plus the config load in one step: `./scripts/install-roles.sh`
+Or run everything above plus the config load in one step:
+
+```bash
+./scripts/install-roles.sh
+```
+
+### Troubleshooting role installs
+
+| Error | Cause | Fix |
+|---|---|---|
+| `geerlingguy.apache (x.y.z) is already installed` then `Request failed` | Role already on the server | Add `--force` |
+| `Collection already installed ... installed globally` | Collection ships with Ludus | Nothing to do; skip it |
+| Help text printed instead of running | Typo in subcommand (e.g. `collection role add`) | Use `ludus ansible role add` or `ludus ansible collection add` |
 
 ## 2. Deploy the range
 
