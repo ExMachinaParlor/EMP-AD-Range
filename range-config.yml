@@ -32,7 +32,7 @@ ludus:
     ram_gb: 6
     cpus: 2
     windows:
-      sysprep: 
+      sysprep: true
     domain:
       fqdn: emprange.net
       role: alt-dc
