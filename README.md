@@ -245,3 +245,9 @@ curl -sI http://127.0.0.1/ | head -1  # HTTP/1.1 200 OK
 | WEB01 local                 | Ludus template default |
 
 Change the domain passwords in `defaults` (range-config.yml) and FS01 `role_vars` together — the FS01 role authenticates with `fs_domain_admin_password`.
+
+### Troubleshooting deploys
+
+| Error | Cause | Fix |
+| --- | --- | --- |
+| `SID of the domain you attempted to join was identical to the SID of this machine` (DC02 promote or FS01 join) | Cloned from the same win2022 template as DC01 with `sysprep: false` | Set `windows: sysprep: true` on that VM, `ludus range config set -f range-config.yml`, then `ludus range deploy -l "<rangeID>-DC02"` |
